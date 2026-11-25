@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Hospitalar - Atendimento e Alta Médica</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        @page { margin: 0; }
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        html { background-color: #f1f5f9; }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f1f5f9;
+        }
+
+        /* Estrutura do PDF fixada no topo */
+        #pdf-template {
+            width: 794px;
+            height: 1123px;
+            background: white;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .pdf-section {
+            page-break-inside: avoid;
+        }
+
+        @media print {
+            body { padding: 0; background: none; }
+            #pdf-template {
+                width: 210mm;
+                height: 297mm;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4 sm:p-6">
+
+    <!-- FORMULÁRIO CLÍNICO -->
+    <div class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden my-6">
+
+        <!-- CABEÇALHO DO FORMULÁRIO -->
+        <header class="bg-slate-900 text-white p-6 sm:p-8 border-b-4 border-blue-600">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <div class="flex items-center gap-2 text-blue-400 font-semibold text-xs uppercase tracking-widest mb-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        Módulo de Prontuário Eletrônico
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+                        Ficha de Atendimento &amp; Alta Médica
+                    </h1>
+                </div>
+                <div class="text-xs bg-slate-800 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 font-mono">
+                    REF: PRONT-2026/ALT
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPO DO FORMULÁRIO -->
+        <form id="formAtendimento" class="p-6 sm:p-8 space-y-6 text-left">
+
+            <!-- SEÇÃO 1: MÉDICO -->
+            <section class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+                    <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                        <span class="bg-blue-600 text-white w-5 h-5 rounded-full inline-flex items-center justify-center text-xs">1</span>
+                        Identificação do Profissional Responsável
+                    </h2>
+                    <span class="text-xs text-slate-400 font-medium">* Campos Obrigatórios</span>
+                </div>
+
+                <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="sm:col-span-2">
+                        <label for="medico" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
+                            Nome do Médico / Profissional *
+                        </label>
+                        <input type="text" id="medico" required autocomplete="off" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition outline-none" placeholder="Dr. Nome do Profissional">
+                    </div>
+
+                    <div>
+                        <label for="crm" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
+                            Registro Profissional (CRM/UF) *
+                        </label>
+                        <input type="text" id="crm" required autocomplete="off" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition outline-none font-mono" placeholder="CRM 00000/UF">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 2: PACIENTE -->
+            <section class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+                    <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                        <span class="bg-blue-600 text-white w-5 h-5 rounded-full inline-flex items-center justify-center text-xs">2</span>
+                        Dados Clientes / Paciente
+                    </h2>
+                </div>
+
+                <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="sm:col-span-2">
+                        <label for="paciente" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
+                            Nome Completo do Paciente *
+                        </label>
+                        <input type="text" id="paciente" required autocomplete="off" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition outline-none" placeholder="Nome Completo do Paciente">
+                    </div>
+
+                    <div>
+                        <label for="idade" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
+                            Idade (Anos) *
+                        </label>
+                        <input type="number" id="idade" required min="0" max="150" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition outline-none" placeholder="Ex: 35">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 3: CLÍNICA -->
+            <section class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+                    <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                        <span class="bg-blue-600 text-white w-5 h-5 rounded-full inline-flex items-center justify-center text-xs">3</span>
+                        Avaliação Clínica &amp; Conduta de Alta
+                    </h2>
+                </div>
+
+                <div class="p-4 sm:p-5 space-y-4">
+                    <div>
+                        <label for="diagnostico" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
+                            Diagnóstico Nosológico / CID *
+                        </label>
+                        <input type="text" id="diagnostico" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition outline-none" placeholder="Informe o diagnóstico principal ou CID-10">
+                    </div>
+
+                    <div>
+                        <label for="observacoes" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
+                            Evolução Clínica, Prescrição de Alta e Orientações *
+                        </label>
+                        <textarea id="observacoes" rows="5" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition outline-none leading-relaxed" placeholder="Descreva o resumo da internação/atendimento..."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 4: SOLICITAÇÃO AO ALMOXARIFADO -->
+            <section class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+                    <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                        <span class="bg-blue-600 text-white w-5 h-5 rounded-full inline-flex items-center justify-center text-xs">4</span>
+                        Solicitação de Medicamento ao Almoxarifado
+                    </h2>
+                </div>
+                <div class="p-4 sm:p-5 space-y-4">
+                    <p class="text-xs text-slate-500">Envie uma solicitação independente do relatório de alta. Ela aparecerá no almoxarifado como pendente.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="solMedicamento" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Medicamento / apresentação *</label>
+                            <input id="solMedicamento" type="text" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm" placeholder="Ex.: Dipirona 500 mg" autocomplete="off">
+                        </div>
+                        <div>
+                            <label for="solQuantidade" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Quantidade solicitada *</label>
+                            <input id="solQuantidade" type="number" min="1" step="1" value="1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm">
+                        </div>
+                        <div>
+                            <label for="solDose" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Dose / concentração</label>
+                            <input id="solDose" type="text" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm" placeholder="Ex.: 500 mg">
+                        </div>
+                        <div>
+                            <label for="solVia" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Via de administração</label>
+                            <select id="solVia" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm">
+                                <option value="Não informada">Selecione...</option>
+                                <option>Oral</option>
+                                <option>Intravenosa</option>
+                                <option>Intramuscular</option>
+                                <option>Subcutânea</option>
+                                <option>Tópica</option>
+                                <option>Inalatória</option>
+                                <option>Outra</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="solFrequencia" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Frequência</label>
+                            <input id="solFrequencia" type="text" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm" placeholder="Ex.: conforme prescrição">
+                        </div>
+                        <div>
+                            <label for="solDuracao" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Duração</label>
+                            <input id="solDuracao" type="text" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm" placeholder="Ex.: 5 dias">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="solOrientacoes" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Observações da solicitação</label>
+                        <textarea id="solOrientacoes" rows="2" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 text-sm" placeholder="Informações adicionais, se necessário"></textarea>
+                    </div>
+                    <button type="button" onclick="enviarSolicitacaoMedicamento()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition shadow-md text-sm">
+                        📦 Enviar solicitação ao almoxarifado
+                    </button>
+                    <div id="solMensagem" class="text-sm font-semibold" role="status" aria-live="polite"></div>
+                    <div class="border-t border-slate-200 pt-4">
+                        <h3 class="text-sm font-bold text-slate-700 mb-2">Solicitações feitas neste navegador</h3>
+                        <div id="minhasSolicitacoes" class="space-y-2 text-sm text-slate-600">Nenhuma solicitação enviada.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BOTÃO DE AÇÃO -->
+            <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200">
+                <p class="text-xs text-slate-500 italic">
+                    Ao confirmar, o documento será compilado no formato oficial A4.
+                </p>
+                <button type="button" onclick="gerarPDFAlta()" class="w-full sm:w-auto bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 shadow-md flex items-center justify-center gap-2 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Emitir Alta &amp; Gerar Relatório PDF
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- TEMPLATE DO PDF ALINHADO NO TOPO -->
+    <div id="pdf-template" class="hidden bg-white text-slate-800">
+
+        <div style="width: 100%; padding: 40px 48px 30px 48px; box-sizing: border-box; display: flex; flex-direction: column;">
+
+            <!-- CABEÇALHO -->
+            <div class="border-b-2 border-blue-700 pb-3 mb-5 flex justify-between items-start pdf-section">
+                <div>
+                    <h1 style="font-size: 20px; font-weight: bold; color: #1e3a8a; margin: 0; line-height: 1.2;">
+                        HOSPITAL GERAL
+                    </h1>
+                    <h2 style="font-size: 15px; font-weight: bold; color: #1e293b; margin-top: 4px; margin-bottom: 0;">
+                        RELATÓRIO DE ATENDIMENTO E ALTA MÉDICA
+                    </h2>
+                    <p style="font-size: 10px; color: #64748b; margin-top: 2px; margin-bottom: 0;">
+                        Documento de atendimento clínico
+                    </p>
+                </div>
+
+                <div style="text-align: right; font-size: 10px; color: #64748b;">
+                    <strong>Emitido em:</strong>
+                    <div id="pdf-data" style="margin-top: 2px;"></div>
+                </div>
+            </div>
+
+            <!-- PROFISSIONAL -->
+            <div class="pdf-section" style="margin-bottom: 14px;">
+                <h3 style="font-size: 11px; font-weight: bold; color: #1e40af; background: #eff6ff; padding: 5px 8px; border-radius: 4px; margin: 0 0 6px 0; text-transform: uppercase; letter-spacing: 0.5px;">
+                    IDENTIFICAÇÃO DO PROFISSIONAL
+                </h3>
+                <div style="font-size: 11px; line-height: 1.6; color: #1e293b; padding-left: 2px;">
+                    <p style="margin: 0;"><strong>Médico Responsável:</strong> <span id="pdf-medico"></span></p>
+                    <p style="margin: 0;"><strong>CRM:</strong> <span id="pdf-crm"></span></p>
+                </div>
+            </div>
+
+            <!-- PACIENTE -->
+            <div class="pdf-section" style="margin-bottom: 14px;">
+                <h3 style="font-size: 11px; font-weight: bold; color: #1e40af; background: #eff6ff; padding: 5px 8px; border-radius: 4px; margin: 0 0 6px 0; text-transform: uppercase; letter-spacing: 0.5px;">
+                    IDENTIFICAÇÃO DO PACIENTE
+                </h3>
+                <div style="font-size: 11px; line-height: 1.6; color: #1e293b; padding-left: 2px;">
+                    <p style="margin: 0;"><strong>Nome do Paciente:</strong> <span id="pdf-paciente"></span></p>
+                    <p style="margin: 0;"><strong>Idade:</strong> <span id="pdf-idade"></span> anos</p>
+                </div>
+            </div>
+
+            <!-- DIAGNÓSTICO -->
+            <div class="pdf-section" style="margin-bottom: 14px;">
+                <h3 style="font-size: 11px; font-weight: bold; color: #1e40af; background: #eff6ff; padding: 5px 8px; border-radius: 4px; margin: 0 0 6px 0; text-transform: uppercase; letter-spacing: 0.5px;">
+                    DIAGNÓSTICO PRINCIPAL
+                </h3>
+                <p id="pdf-diagnostico" style="font-size: 11px; line-height: 1.6; margin: 0; color: #1e293b; padding-left: 2px;"></p>
+            </div>
+
+            <!-- OBSERVAÇÕES -->
+            <div class="pdf-section" style="margin-bottom: 24px;">
+                <h3 style="font-size: 11px; font-weight: bold; color: #1e40af; background: #eff6ff; padding: 5px 8px; border-radius: 4px; margin: 0 0 6px 0; text-transform: uppercase; letter-spacing: 0.5px;">
+                    OBSERVAÇÕES, CONDUTA E PRESCRIÇÕES
+                </h3>
+                <p id="pdf-observacoes" style="font-size: 11px; line-height: 1.55; margin: 0; white-space: pre-wrap; overflow-wrap: break-word; color: #1e293b; padding-left: 2px;"></p>
+            </div>
+
+            <!-- ASSINATURA -->
+            <div class="pdf-section" style="text-align: center; margin-top: 45px;">
+                <div style="width: 280px; margin: 0 auto; border-top: 1px solid #64748b; padding-top: 6px;">
+                    <p id="pdf-ass-medico" style="font-size: 11px; font-weight: bold; margin: 0; color: #0f172a;"></p>
+                    <p id="pdf-ass-crm" style="font-size: 10px; color: #475569; margin: 2px 0 0 0;"></p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RODAPÉ FIXO -->
+        <div style="margin-top: auto; padding: 12px 48px 24px 48px; border-top: 1px solid #e2e8f0; text-align: center; color: #94a3b8; font-size: 8.5pt;">
+            <p style="margin: 0;">Relatório gerado pelo Sistema Hospitalar</p>
+            <p style="margin: 2px 0 0 0;">Documento oficial para registro do atendimento e alta médica.</p>
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        const CHAVE_SOLICITACOES = "hospital_solicitacoes_medicamentos";
+
+        function lerSolicitacoes() {
+            try { return JSON.parse(localStorage.getItem(CHAVE_SOLICITACOES)) || []; }
+            catch (e) { return []; }
+        }
+
+        function enviarSolicitacaoMedicamento() {
+            const medico = document.getElementById("medico").value.trim();
+            const crm = document.getElementById("crm").value.trim();
+            const paciente = document.getElementById("paciente").value.trim();
+            const medicamento = document.getElementById("solMedicamento").value.trim();
+            const quantidade = Number(document.getElementById("solQuantidade").value);
+
+            if (!medico || !crm || !paciente) {
+                alert("Preencha primeiro o nome/CRM do profissional e o paciente na ficha.");
+                return;
+            }
+            if (!medicamento || !Number.isInteger(quantidade) || quantidade < 1) {
+                alert("Informe o medicamento e uma quantidade válida (número inteiro maior que zero).");
+                return;
+            }
+
+            const solicitacoes = lerSolicitacoes();
+            const pedido = {
+                id: "SOL-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+                criadoEm: new Date().toISOString(),
+                dataExibicao: new Date().toLocaleString("pt-BR"),
+                medico,
+                crm,
+                paciente,
+                idade: document.getElementById("idade").value.trim(),
+                medicamento,
+                quantidade,
+                dose: document.getElementById("solDose").value.trim(),
+                via: document.getElementById("solVia").value,
+                frequencia: document.getElementById("solFrequencia").value.trim(),
+                duracao: document.getElementById("solDuracao").value.trim(),
+                observacoes: document.getElementById("solOrientacoes").value.trim(),
+                status: "Pendente"
+            };
+
+            solicitacoes.push(pedido);
+            localStorage.setItem(CHAVE_SOLICITACOES, JSON.stringify(solicitacoes));
+            document.getElementById("solMensagem").textContent = "Solicitação enviada ao almoxarifado!";
+            document.getElementById("solMensagem").className = "text-sm font-semibold text-emerald-700";
+            document.getElementById("solMedicamento").value = "";
+            document.getElementById("solQuantidade").value = "1";
+            document.getElementById("solDose").value = "";
+            document.getElementById("solVia").value = "Não informada";
+            document.getElementById("solFrequencia").value = "";
+            document.getElementById("solDuracao").value = "";
+            document.getElementById("solOrientacoes").value = "";
+            renderMinhasSolicitacoes();
+        }
+
+        function renderMinhasSolicitacoes() {
+            const alvo = document.getElementById("minhasSolicitacoes");
+            if (!alvo) return;
+            const minhas = lerSolicitacoes().slice().reverse().slice(0, 8);
+            if (!minhas.length) {
+                alvo.textContent = "Nenhuma solicitação enviada.";
+                return;
+            }
+            alvo.innerHTML = minhas.map(p => `
+                <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                    <div class="flex flex-wrap justify-between gap-2">
+                        <strong>${escapeHTML(p.medicamento)} × ${Number(p.quantidade) || 0}</strong>
+                        <span class="font-bold">${escapeHTML(p.status || "Pendente")}</span>
+                    </div>
+                    <div>Paciente: ${escapeHTML(p.paciente)} · ${escapeHTML(p.dataExibicao || "")}</div>
+                </div>`).join("");
+        }
+
+        function escapeHTML(valor) {
+            return String(valor ?? "").replace(/[&<>"']/g, c => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+            }[c]));
+        }
+
+        window.addEventListener("storage", function(e) {
+            if (e.key === CHAVE_SOLICITACOES) renderMinhasSolicitacoes();
+        });
+
+        function gerarPDFAlta() {
+            const medico = document.getElementById("medico").value.trim();
+            const crm = document.getElementById("crm").value.trim();
+            const paciente = document.getElementById("paciente").value.trim();
+            const idade = document.getElementById("idade").value.trim();
+            const diagnostico = document.getElementById("diagnostico").value.trim();
+            const observacoes = document.getElementById("observacoes").value.trim();
+
+            if (!medico || !crm || !paciente || !idade || !diagnostico || !observacoes) {
+                alert("Por favor, preencha todos os campos obrigatórios.");
+                return;
+            }
+
+            const agora = new Date();
+            const data = agora.toLocaleDateString("pt-BR");
+            const hora = agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+            document.getElementById("pdf-data").textContent = `${data} às ${hora}`;
+            document.getElementById("pdf-medico").textContent = medico;
+            document.getElementById("pdf-crm").textContent = crm;
+            document.getElementById("pdf-paciente").textContent = paciente;
+            document.getElementById("pdf-idade").textContent = idade;
+            document.getElementById("pdf-diagnostico").textContent = diagnostico;
+            document.getElementById("pdf-observacoes").textContent = observacoes;
+            document.getElementById("pdf-ass-medico").textContent = medico;
+            document.getElementById("pdf-ass-crm").textContent = "CRM: " + crm;
+
+            const elemento = document.getElementById("pdf-template");
+            elemento.classList.remove("hidden");
+
+            const nomeArquivoPaciente = paciente
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-zA-Z0-9]/g, "_");
+
+            const nomeArquivo = `Alta_Medica_${nomeArquivoPaciente}.pdf`;
+
+            const opcoes = {
+                margin: 0,
+                filename: nomeArquivo,
+                image: { type: "jpeg", quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: "#ffffff",
+                    width: 794,
+                    height: 1123,
+                    scrollY: 0,
+                    scrollX: 0
+                },
+                jsPDF: { unit: "mm", format: "a4", orientation: "portrait", compress: true },
+                pagebreak: { mode: [] }
+            };
+
+            html2pdf()
+                .set(opcoes)
+                .from(elemento)
+                .toPdf()
+                .get("pdf")
+                .then(function(pdf) {
+                    while (pdf.internal.getNumberOfPages() > 1) {
+                        pdf.deletePage(pdf.internal.getNumberOfPages());
+                    }
+                })
+                .save()
+                .then(function() {
+                    elemento.classList.add("hidden");
+                    document.getElementById("formAtendimento").reset();
+                    alert("Atendimento finalizado e PDF gerado em uma única folha!");
+                })
+                .catch(function(erro) {
+                    console.error("Erro ao gerar PDF:", erro);
+                    elemento.classList.add("hidden");
+                    alert("Ocorreu um erro ao gerar o PDF.");
+                });
+        }
+
+        document.addEventListener("DOMContentLoaded", renderMinhasSolicitacoes);
+    </script>
+</body>
+</html>

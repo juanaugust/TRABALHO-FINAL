@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Pro - Almoxarifado Sentinela &amp; Dispensação</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --secondary: #0ea5e9;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --purple: #7c3aed;
+            --bg-body: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 1rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .nav-brand h1 { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.5px; }
+        .nav-brand span { font-size: 0.8rem; color: #94a3b8; font-weight: 500; }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-pill {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #f8fafc;
+        }
+
+        .container {
+            max-width: 1350px;
+            margin: 2rem auto;
+            padding: 0 25px;
+        }
+
+        .alerta-estoque {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1px solid #fde68a;
+            border-left: 6px solid var(--warning);
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            color: #92400e;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow);
+        }
+        .alerta-estoque span { font-weight: 700; }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        .stat-icon.purple { background: #f3e8ff; color: var(--purple); }
+        .stat-icon.green { background: #d1fae5; color: var(--success); }
+        .stat-icon.orange { background: #fef3c7; color: var(--warning); }
+        .stat-icon.red { background: #fee2e2; color: var(--danger); }
+
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--text-main); line-height: 1.1; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-top: 4px; letter-spacing: 0.5px; }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 2rem;
+        }
+
+        @media(max-width: 1024px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header h2 { font-size: 1.1rem; color: var(--text-main); font-weight: 700; }
+
+        .card-body { padding: 1.5rem; flex: 1; }
+
+        .form-group { margin-bottom: 1.2rem; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #334155;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+        .btn-primary:hover { opacity: 0.95; transform: translateY(-1px); }
+
+        .table-actions {
+            padding: 1rem 1.5rem;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        .search-box input { padding-left: 38px; }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            flex: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr:hover { background: #f1f5f9; }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .badge-normal { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .badge-baixo { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .badge-zerado { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .badge-vencido { background: #ffe4e6; color: #9f1239; border: 1px solid #fecdd3; }
+
+        .cat-tag {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            color: #334155;
+            display: inline-block;
+        }
+
+        .btn-action {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        .btn-action:hover { background: #0284c7; color: white; }
+
+        .request-status { display:inline-block; padding:5px 8px; border-radius:6px; font-size:.75rem; font-weight:700; background:#fef3c7; color:#92400e; }
+        .request-status.separacao { background:#dbeafe; color:#1d4ed8; }
+        .request-status.atendida { background:#d1fae5; color:#065f46; }
+        .request-actions { display:flex; gap:6px; flex-wrap:wrap; }
+        .btn-request { border:0; border-radius:6px; padding:6px 9px; font-size:.75rem; font-weight:700; cursor:pointer; background:#e0f2fe; color:#0369a1; }
+        .btn-request.green { background:#d1fae5; color:#065f46; }
+        .btn-request.gray { background:#e2e8f0; color:#334155; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+        .modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 450px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .modal-header h3 { font-size: 1.2rem; color: var(--text-main); }
+        .btn-close {
+            background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-brand">
+            <div class="logo-icon">🏥</div>
+            <div>
+                <h1>Hospital Pro • Almoxarifado Sentinela</h1>
+                <span>Gestão de Insumos, Lotes e Dispensação Segura</span>
+            </div>
+        </div>
+        <div class="nav-user">
+            <span class="user-pill">📦 Almoxarifado Central</span>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div class="alerta-estoque">
+            <span>⚠️ PROTOCOLO SENTINELA ATIVO:</span> Toda dispensação exige identificação do paciente, leito e profissional responsável para evitar desvios e erros de medicação.
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-icon purple">📦</div>
+                <div>
+                    <div class="stat-value" id="statItens">0</div>
+                    <div class="stat-label">Insumos Cadastrados</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">✅</div>
+                <div>
+                    <div class="stat-value" id="statOK">0</div>
+                    <div class="stat-label">Estoque Normal</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">⚠️</div>
+                <div>
+                    <div class="stat-value" id="statBaixo">0</div>
+                    <div class="stat-label">Estoque Crítico (&le; 10)</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red">🚨</div>
+                <div>
+                    <div class="stat-value" id="statZerado">0</div>
+                    <div class="stat-label">Esgotados</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+
+            <!-- Formulário de Cadastro de Insumos -->
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>➕ Novo Insumo / Entrada</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="formMedicamento" onsubmit="adicionarMedicamento(event)">
+                            <div class="form-group">
+                                <label for="emNome">Nome do Insumo / Concentração:</label>
+                                <input type="text" id="emNome" class="form-control" placeholder="Ex: Morfina 10mg/ml" required autocomplete="off">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="emCategoria">Categoria Hospitalar:</label>
+                                <select id="emCategoria" class="form-control">
+                                    <option value="Comprimidos">Comprimidos / Cápsulas</option>
+                                    <option value="Soluções/Soros">Soros / Soluções IV</option>
+                                    <option value="Injetáveis/Ampolas">Injetáveis / Ampolas</option>
+                                    <option value="Antibióticos">Antibióticos (Controle)</option>
+                                    <option value="Anticorpos/Biológicos">Anticorpos / Biológicos</option>
+                                    <option value="Vacinas/Imuno">Vacinas / Imunobiológicos</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="emLote">Número do Lote:</label>
+                                <input type="text" id="emLote" class="form-control" placeholder="Ex: LOTE-8821-SP" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="emQtd">Quantidade Inicial:</label>
+                                <input type="number" id="emQtd" class="form-control" value="40" min="0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="emValidade">Data de Validade:</label>
+                                <input type="date" id="emValidade" class="form-control" required>
+                            </div>
+
+                            <button type="submit" class="btn-primary">Cadastrar no Sistema</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Listagem e Gestão -->
+            <div>
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div class="card-header">
+                        <h2>📋 Estoque Atual e Dispensação</h2>
+                        <span id="badgeTotalGeral" class="badge badge-normal">Total: 0</span>
+                    </div>
+
+                    <div class="table-actions">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="inputBusca" class="form-control" placeholder="Filtrar por nome, lote ou categoria..." onkeyup="filtrarTabela()">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Insumo</th>
+                                    <th>Categoria</th>
+                                    <th>Lote</th>
+                                    <th>Qtd</th>
+                                    <th>Validade</th>
+                                    <th>Status</th>
+                                    <th style="text-align: right;">Ação Sentinela</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaEstoque">
+                                <!-- Preenchido por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Solicitações recebidas do módulo médico -->
+                <div class="card" id="cardSolicitacoes">
+                    <div class="card-header">
+                        <h2>📥 Solicitações Médicas Recebidas</h2>
+                        <span id="badgeSolicitacoes" class="badge badge-baixo">Pendentes: 0</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Medicamento / Quantidade</th>
+                                    <th>Paciente</th>
+                                    <th>Médico / CRM</th>
+                                    <th>Prescrição / Observações</th>
+                                    <th>Status / Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaSolicitacoes">
+                                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">Nenhuma solicitação recebida.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Histórico de Auditoria de Saídas -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📜 Log de Auditoria de Dispensação (Projeto Sentinela)</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Horário</th>
+                                    <th>Medicamento</th>
+                                    <th>Qtd</th>
+                                    <th>Paciente</th>
+                                    <th>Leito</th>
+                                    <th>Profissional Resp.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaAuditoria">
+                                <tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 20px;">Nenhuma dispensação registrada nesta sessão.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal de Baixa / Dispensação Segura -->
+    <div class="modal-overlay" id="modalDispensacao">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalTituloMed">Dispensar Medicamento</h3>
+                <button class="btn-close" onclick="fecharModal()">&times;</button>
+            </div>
+            <form onsubmit="realizarDispensacao(event)">
+                <input type="hidden" id="modalIdMed">
+
+                <div class="form-group">
+                    <label for="dispQtd">Quantidade a Dispensar:</label>
+                    <input type="number" id="dispQtd" class="form-control" value="1" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dispPaciente">Nome Completo do Paciente:</label>
+                    <input type="text" id="dispPaciente" class="form-control" placeholder="Ex: Maria da Silva Souza" required autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="dispLeito">Número do Leito / Ala:</label>
+                    <input type="text" id="dispLeito" class="form-control" placeholder="Ex: UTI 03 - Leito B" required autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="dispProfissional">Profissional Responsável (Enfermeiro/Médico):</label>
+                    <input type="text" id="dispProfissional" class="form-control" placeholder="Ex: Enf. Carlos Alberto (COREN 55432)" required autocomplete="off">
+                </div>
+
+                <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); margin-top: 10px;">Confirmar Dispensação Segura</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const CHAVE_SOLICITACOES = "hospital_solicitacoes_medicamentos";
+
+        function lerSolicitacoes() {
+            try { return JSON.parse(localStorage.getItem(CHAVE_SOLICITACOES)) || []; }
+            catch (e) { return []; }
+        }
+
+        function atualizarSolicitacoes() {
+            const pedidos = lerSolicitacoes();
+            const tbody = document.getElementById("tabelaSolicitacoes");
+            const pendentes = pedidos.filter(p => (p.status || "Pendente") === "Pendente").length;
+            document.getElementById("badgeSolicitacoes").textContent = "Pendentes: " + pendentes;
+            tbody.innerHTML = "";
+
+            if (!pedidos.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">Nenhuma solicitação recebida. Envie uma pelo arquivo medico.html.</td></tr>';
+                return;
+            }
+
+            pedidos.slice().reverse().forEach(p => {
+                const status = p.status || "Pendente";
+                const statusClass = status === "Atendida" ? "atendida" : (status === "Em separação" ? "separacao" : "");
+                const prescricao = [
+                    p.dose ? "Dose: " + p.dose : "",
+                    p.via && p.via !== "Não informada" ? "Via: " + p.via : "",
+                    p.frequencia ? "Frequência: " + p.frequencia : "",
+                    p.duracao ? "Duração: " + p.duracao : "",
+                    p.observacoes || ""
+                ].filter(Boolean).join(" · ");
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><small>${escapeHTML(p.dataExibicao || (p.criadoEm ? new Date(p.criadoEm).toLocaleString("pt-BR") : "-"))}</small></td>
+                    <td><strong>${escapeHTML(p.medicamento)}</strong><br><span style="color:var(--primary);font-weight:800;">Qtd: ${Number(p.quantidade) || 0}</span></td>
+                    <td>${escapeHTML(p.paciente)}${p.idade ? "<br><small>Idade: " + escapeHTML(p.idade) + "</small>" : ""}</td>
+                    <td>${escapeHTML(p.medico)}<br><small>${escapeHTML(p.crm)}</small></td>
+                    <td style="min-width:180px;white-space:normal;"><small>${escapeHTML(prescricao || "Sem detalhes adicionais")}</small></td>
+                    <td>
+                        <span class="request-status ${statusClass}">${escapeHTML(status)}</span>
+                        <div class="request-actions" style="margin-top:7px;">
+                            ${status === "Pendente" ? `<button class="btn-request" onclick="alterarStatusSolicitacao('${escapeHTML(p.id)}','Em separação')">Separar</button>` : ""}
+                            ${status !== "Atendida" ? `<button class="btn-request green" onclick="alterarStatusSolicitacao('${escapeHTML(p.id)}','Atendida')">Atendida</button>` : ""}
+                            ${status !== "Pendente" ? `<button class="btn-request gray" onclick="alterarStatusSolicitacao('${escapeHTML(p.id)}','Pendente')">Reabrir</button>` : ""}
+                        </div>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function alterarStatusSolicitacao(id, novoStatus) {
+            const pedidos = lerSolicitacoes();
+            const pedido = pedidos.find(p => p.id === id);
+            if (!pedido) return;
+            pedido.status = novoStatus;
+            pedido.atualizadoEm = new Date().toISOString();
+            localStorage.setItem(CHAVE_SOLICITACOES, JSON.stringify(pedidos));
+            atualizarSolicitacoes();
+            alert("Status da solicitação atualizado para: " + novoStatus + ".");
+        }
+
+        function escapeHTML(valor) {
+            return String(valor ?? "").replace(/[&<>"']/g, c => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+            }[c]));
+        }
+
+        window.addEventListener("storage", function(e) {
+            if (e.key === CHAVE_SOLICITACOES) atualizarSolicitacoes();
+            if (e.key === "hospital_estoque") atualizarInterface();
+            if (e.key === "hospital_auditoria") atualizarTabelaAuditoria();
+        });
+
+        let estoque = JSON.parse(localStorage.getItem('hospital_estoque')) || [
+            { id: 1, nome: "Dipirona Sódica 500mg/ml", categoria: "Injetáveis/Ampolas", lote: "DIP-4012", qtd: 85, validade: "2027-08-15" },
+            { id: 2, nome: "Vancomicina 500mg (Pó Liofilizado)", categoria: "Antibióticos", lote: "ANT-7731", qtd: 6, validade: "2026-12-10" },
+            { id: 3, nome: "Adrenalina (Epinefrina) 1mg/ml", categoria: "Injetáveis/Ampolas", lote: "EMG-1029", qtd: 12, validade: "2026-10-05" },
+            { id: 4, nome: "Trastuzumabe 440mg (Anticorpo)", categoria: "Anticorpos/Biológicos", lote: "BIO-8821", qtd: 14, validade: "2027-05-20" },
+            { id: 5, nome: "Soro Glicosado 5% 500ml", categoria: "Soluções/Soros", lote: "SR-9932", qtd: 210, validade: "2028-02-14" }
+        ];
+
+        let auditoria = JSON.parse(localStorage.getItem('hospital_auditoria')) || [];
+
+        function atualizarInterface(dadosFiltrados = estoque) {
+            const tbody = document.getElementById('tabelaEstoque');
+            tbody.innerHTML = '';
+
+            let totalTipos = estoque.length;
+            let normal = 0, baixo = 0, zerado = 0;
+
+            estoque.forEach(item => {
+                if (item.qtd === 0) zerado++;
+                else if (item.qtd <= 10) baixo++;
+                else normal++;
+            });
+
+            if (dadosFiltrados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 30px;">Nenhum insumo encontrado.</td></tr>`;
+            }
+
+            const hoje = new Date();
+            const hojeISO = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+
+            dadosFiltrados.forEach((item) => {
+                let statusBadge = '';
+                const estaVencido = item.validade && item.validade < hojeISO;
+
+                if (estaVencido) {
+                    statusBadge = '<span class="badge badge-vencido">⛔ VENCIDO</span>';
+                } else if (item.qtd === 0) {
+                    statusBadge = '<span class="badge badge-zerado">🚨 ESGOTADO</span>';
+                } else if (item.qtd <= 10) {
+                    statusBadge = '<span class="badge badge-baixo">⚠️ CRÍTICO</span>';
+                } else {
+                    statusBadge = '<span class="badge badge-normal">✅ NORMAL</span>';
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${escapeHTML(item.nome)}</strong></td>
+                    <td><span class="cat-tag">${escapeHTML(item.categoria)}</span></td>
+                    <td><code>${escapeHTML(item.lote)}</code></td>
+                    <td><strong style="font-size: 1.05rem;">${Number(item.qtd) || 0}</strong></td>
+                    <td>${formatarData(item.validade)}</td>
+                    <td>${statusBadge}</td>
+                    <td style="text-align: right;">
+                        <button class="btn-action" onclick="abrirModal(${item.id})">💉 Dispensar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('statItens').innerText = totalTipos;
+            document.getElementById('statOK').innerText = normal;
+            document.getElementById('statBaixo').innerText = baixo;
+            document.getElementById('statZerado').innerText = zerado;
+            document.getElementById('badgeTotalGeral').innerText = `Total: ${totalTipos} itens`;
+
+            atualizarTabelaAuditoria();
+            localStorage.setItem('hospital_estoque', JSON.stringify(estoque));
+        }
+
+        function atualizarTabelaAuditoria() {
+            const tbody = document.getElementById('tabelaAuditoria');
+            tbody.innerHTML = '';
+
+            if (auditoria.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 20px;">Nenhuma dispensação registrada nesta sessão.</td></tr>`;
+                return;
+            }
+
+            auditoria.slice().reverse().forEach(log => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><small>${escapeHTML(log.horario)}</small></td>
+                    <td><strong>${escapeHTML(log.medicamento)}</strong></td>
+                    <td><span style="color: var(--danger); font-weight:700;">-${Number(log.qtd) || 0}</span></td>
+                    <td>${escapeHTML(log.paciente)}</td>
+                    <td><code>${escapeHTML(log.leito)}</code></td>
+                    <td><small>${escapeHTML(log.profissional)}</small></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            localStorage.setItem('hospital_auditoria', JSON.stringify(auditoria));
+        }
+
+        function formatarData(dataIso) {
+            if (!dataIso) return '-';
+            const partes = dataIso.split('-');
+            if (partes.length !== 3) return dataIso;
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        function adicionarMedicamento(event) {
+            event.preventDefault();
+
+            const nome = document.getElementById('emNome').value.trim();
+            const categoria = document.getElementById('emCategoria').value;
+            const lote = document.getElementById('emLote').value.trim();
+            const qtd = parseInt(document.getElementById('emQtd').value, 10);
+            const validade = document.getElementById('emValidade').value;
+
+            estoque.unshift({ id: Date.now(), nome, categoria, lote, qtd, validade });
+
+            document.getElementById('formMedicamento').reset();
+            document.getElementById('emQtd').value = '40';
+
+            filtrarTabela();
+            alert('✅ Insumo cadastrado com sucesso!');
+        }
+
+        function abrirModal(id) {
+            const item = estoque.find(i => i.id === id);
+
+            if (item) {
+                const hoje = new Date();
+                const hojeISO = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+
+                if (item.validade && item.validade < hojeISO) {
+                    alert('⛔ Operação negada: Este medicamento está VENCIDO e não pode ser dispensado!');
+                    filtrarTabela();
+                    return;
+                }
+
+                if (item.qtd <= 0) {
+                    alert('❌ Operação negada: Este medicamento está esgotado!');
+                    return;
+                }
+
+                document.getElementById('modalIdMed').value = item.id;
+                document.getElementById('modalTituloMed').innerText = `Dispensar: ${item.nome}`;
+                document.getElementById('dispQtd').value = 1;
+                document.getElementById('dispQtd').max = item.qtd;
+                document.getElementById('dispPaciente').value = '';
+                document.getElementById('dispLeito').value = '';
+                document.getElementById('dispProfissional').value = '';
+                document.getElementById('modalDispensacao').style.display = 'flex';
+            }
+        }
+
+        function fecharModal() {
+            document.getElementById('modalDispensacao').style.display = 'none';
+        }
+
+        function realizarDispensacao(event) {
+            event.preventDefault();
+
+            const id = parseInt(document.getElementById('modalIdMed').value, 10);
+            const qtd = parseInt(document.getElementById('dispQtd').value, 10);
+            const paciente = document.getElementById('dispPaciente').value.trim();
+            const leito = document.getElementById('dispLeito').value.trim();
+            const profissional = document.getElementById('dispProfissional').value.trim();
+
+            const item = estoque.find(i => i.id === id);
+
+            if (item) {
+                const hoje = new Date();
+                const hojeISO = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+
+                if (item.validade && item.validade < hojeISO) {
+                    alert('⛔ DISPENSAÇÃO BLOQUEADA: Este medicamento está VENCIDO!');
+                    fecharModal();
+                    filtrarTabela();
+                    return;
+                }
+
+                if (qtd > item.qtd || qtd <= 0) {
+                    alert('❌ Quantidade inválida ou maior que o estoque atual!');
+                    return;
+                }
+
+                item.qtd -= qtd;
+
+                const agora = new Date().toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+
+                auditoria.push({
+                    horario: agora,
+                    medicamento: item.nome,
+                    qtd: qtd,
+                    paciente: paciente,
+                    leito: leito,
+                    profissional: profissional
+                });
+
+                fecharModal();
+                filtrarTabela();
+
+                alert(`✅ Dispensação realizada com sucesso para o paciente ${paciente}! Registro salvo no log de auditoria.`);
+            }
+        }
+
+        function filtrarTabela() {
+            const termo = document.getElementById('inputBusca').value.toLowerCase();
+
+            const filtrados = estoque.filter(item =>
+                item.nome.toLowerCase().includes(termo) ||
+                item.lote.toLowerCase().includes(termo) ||
+                item.categoria.toLowerCase().includes(termo)
+            );
+
+            atualizarInterface(filtrados);
+        }
+
+        window.onload = function() {
+            atualizarInterface();
+            atualizarSolicitacoes();
+            setInterval(atualizarSolicitacoes, 1500);
+        };
+    </script>
+</body>
+</html>

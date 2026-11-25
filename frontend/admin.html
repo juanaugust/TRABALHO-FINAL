@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="container">
+        <a href="index.html" style="text-decoration: none;
+        color: aqua;
+        font-size: 14px;
+        display: inline-block;
+        margin-bottom: 12px;">
+            voltar para o login
+        </a>
+
+        <h2>cadastro de usuários</h2>
+
+        <form id="formaUsuario">
+            <input type="text" id="usuario" placeholder="Nome de usuario (login)" required>
+
+            <input type="password" id="senha" placeholder="senha" required>
+
+            <select id="tipo" required>
+                <option value="">selecione o setor</option>
+                <option value="atendimento">atendimento</option>
+                <option value="triagem">triagem</option>
+                <option value="medico">medico</option>
+                
+            </select>
+
+            <button type="submit">cadastrar usuario</button>
+        </form>
+
+        <hr style="margin: 25px 0; border: none; border-top: 1px solid #ccc;">
+
+        <h3>usuarios cadastrados</h3>
+
+        <div id="listaUsuarios"></div>
+    </div>
+
+    <script>
+        document.getElementById('formaUsuario').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const usuario = document.getElementById('usuario').value;
+            const senha = document.getElementById('senha').value;
+            const tipo = document.getElementById('tipo').value;
+
+            fetch("/usuarios", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ usuario, senha, tipo })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Usuário cadastrado:", data);
+                // Atualizar a lista de usuários
+                listarUsuarios();
+            })
+            .catch(error => {
+                console.error("Erro ao cadastrar usuário:", error);
+                document.getElementById("formaUsuario").reset();
+                carregarUsuarios();
+
+            });
+        });
+
+        function listarUsuarios() {
+            fetch("/usuarios")
+                .then(response => response.json())
+                .then(data => {
+                    const listaUsuarios = document.getElementById("listaUsuarios");
+                    listaUsuarios.innerHTML = "";
+
+                    data.forEach(usuario => {
+                        const usuarioDiv = document.createElement("div");
+                        usuarioDiv.textContent = `ID: ${usuario.id}, Nome: ${usuario.usuario}, Tipo: ${usuario.tipo}`;
+                        listaUsuarios.appendChild(usuarioDiv);
+                    });
+                })
+                .catch(error => {
+                    console.error("Erro ao listar usuários:", error);
+
+                    usuarios.forEach(u => {
+                        div.innerHTML += `
+                        <div class="card">
+                        <b>Usuario:</b> ${u.usuario} <br>
+                        <b>Setor:</b> ${u.tipo}
+                        </div>`
+                    })
+                });
+        }
+
+        // carregar a lista de automaticamente ao carregar a página
+        carregarUsuarios();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recepção & Triagem Hospitalar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --bg-body: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --focus-ring: rgba(2, 132, 199, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      width: 100%;
+      max-width: 900px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #0284c7 0%, #0f766e 100%);
+      color: white;
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .card-header i {
+      font-size: 2.2rem;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 14px;
+      border-radius: 12px;
+    }
+
+    .card-header h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .card-header p {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 2px;
+    }
+
+    form {
+      padding: 40px;
+    }
+
+    .section {
+      margin-bottom: 32px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f0fdf4;
+      position: relative;
+    }
+
+    .section-header::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 50px;
+      height: 2px;
+      background-color: var(--primary);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-8  { grid-column: span 8; }
+    .col-6  { grid-column: span 6; }
+    .col-4  { grid-column: span 4; }
+    .col-3  { grid-column: span 3; }
+
+    @media (max-width: 768px) {
+      .col-8, .col-6, .col-4, .col-3 { grid-column: span 12; }
+      form { padding: 24px; }
+      .card-header { padding: 24px; }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    label i {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      background-color: #f8fafc;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      background-color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--focus-ring);
+    }
+
+    .file-upload-box {
+      border: 2px dashed var(--border);
+      background-color: #f8fafc;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .file-upload-box:hover {
+      border-color: var(--primary);
+      background-color: #f0f9ff;
+    }
+
+    .file-upload-box input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-upload-box i {
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .file-upload-box p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-header">
+    <i class="fa-solid fa-hospital-user"></i>
+    <div>
+      <h2>Admissão de Paciente</h2>
+      <p>Preencha a ficha cadastral para encaminhamento à triagem</p>
+    </div>
+  </div>
+
+  <form id="formAtendimento" onsubmit="event.preventDefault(); cadastrar();">
+    
+    <div class="section">
+      <div class="section-header">
+        <i class="fa-solid fa-user"></i>
+        <span>Dados Identificadores</span>
+      </div>
+      <div class="grid">
+        <div class="field col-8">
+          <label for="nome"><i class="fa-solid fa-signature"></i> Nome Completo</label>
+          <input id="nome" placeholder="Digite o nome completo" required>
+        </div>
+        <div class="field col-4">
+          <label for="dataNascimento"><i class="fa-solid fa-calendar-day"></i> Data de Nascimento</label>
+          <input type="date" id="dataNascimento" required>
+        </div>
+
+        <div class="field col-4">
+          <label for="cpf"><i class="fa-solid fa-id-card"></i> CPF</label>
+          <input id="cpf" placeholder="000.000.000-00" required>
+        </div>
+        <div class="field col-4">
+          <label for="rg"><i class="fa-solid fa-address-card"></i> RG</label>
+          <input id="rg" placeholder="00.000.000-0">
+        </div>
+        <div class="field col-4">
+          <label for="sexo"><i class="fa-solid fa-venus-mars"></i> Sexo</label>
+          <select id="sexo">
+            <option value="masculino">Masculino</option>
+            <option value="feminino">Feminino</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+
+        <div class="field col-8">
+          <label for="nomeMae"><i class="fa-solid fa-person-breastfeeding"></i> Nome da Mãe</label>
+          <input id="nomeMae" placeholder="Nome completo da mãe">
+        </div>
+        <div class="field col-4">
+          <label for="estadoCivil"><i class="fa-solid fa-ring"></i> Estado Civil</label>
+          <select id="estadoCivil">
+            <option value="solteiro">Solteiro(a)</option>
+            <option value="casado">Casado(a)</option>
+            <option value="divorciado">Divorciado(a)</option>
+            <option value="viuvo">Viúvo(a)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <i class="fa-solid fa-location-dot"></i>
+        <span>Contato e Endereço</span>
+      </div>
+      <div class="grid">
+        <div class="field col-12">
+          <label for="endereco"><i class="fa-solid fa-house"></i> Endereço Completo</label>
+          <input id="endereco" placeholder="Rua, Número, Bairro, Cidade - UF">
+        </div>
+        <div class="field col-4">
+          <label for="telefone"><i class="fa-solid fa-phone"></i> Telefone / WhatsApp</label>
+          <input type="tel" id="telefone" placeholder="(00) 00000-0000" required>
+        </div>
+        <div class="field col-4">
+          <label for="email"><i class="fa-solid fa-envelope"></i> E-mail</label>
+          <input type="email" id="email" placeholder="paciente@email.com">
+        </div>
+        <div class="field col-4">
+          <label for="contatoEmergencia"><i class="fa-solid fa-kit-medical"></i> Contato de Emergência</label>
+          <input id="contatoEmergencia" placeholder="Nome e Telefone">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <i class="fa-solid fa-file-medical"></i>
+        <span>Atendimento & Anexos</span>
+      </div>
+      <div class="grid">
+        <div class="field col-6">
+          <label for="tipo"><i class="fa-solid fa-hand-holding-medical"></i> Tipo de Atendimento</label>
+          <select id="tipo">
+            <option value="convenio">Convênio Médico</option>
+            <option value="particular">Particular</option>
+          </select>
+        </div>
+
+        <div class="field col-6">
+          <label><i class="fa-solid fa-paperclip"></i> Anexar Documento / Foto</label>
+          <div class="file-upload-box">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>Clique ou arraste a imagem aqui</p>
+            <input type="file" id="foto">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit">
+      <i class="fa-solid fa-paper-plane"></i>
+      Enviar Paciente para Triagem
+    </button>
+  </form>
+</div>
+
+<script>
+function cadastrar() {
+  const payload = {
+    nome: document.getElementById("nome").value,
+    cpf: document.getElementById("cpf").value,
+    rg: document.getElementById("rg").value,
+    dataNascimento: document.getElementById("dataNascimento").value,
+    sexo: document.getElementById("sexo").value,
+    nomeMae: document.getElementById("nomeMae").value,
+    estadoCivil: document.getElementById("estadoCivil").value,
+    tipo: document.getElementById("tipo").value,
+    endereco: document.getElementById("endereco").value,
+    telefone: document.getElementById("telefone").value,
+    email: document.getElementById("email").value,
+    contatoEmergencia: document.getElementById("contatoEmergencia").value
+  };
+
+  fetch("http://localhost:3000/atendimento", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    if (response.ok) {
+      alert("Paciente encaminhado para a triagem com sucesso!");
+    } else {
+      alert("Erro ao enviar cadastro.");
+    }
+  })
+  .catch(error => {
+    console.error("Erro:", error);
+    alert("Erro na conexão com o servidor.");
+  });
+}
+</script>
+
+</body>
+</html>
